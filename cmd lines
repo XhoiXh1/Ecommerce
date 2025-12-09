@@ -1,0 +1,3 @@
+cd "direction"
+npm install
+node index.js
