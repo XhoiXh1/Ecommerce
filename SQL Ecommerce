@@ -1,0 +1,95 @@
+CREATE DATABASE Ecommerce;
+GO
+
+USE Ecommerce;
+GO
+
+CREATE TABLE Klienti (
+    KlientID INT PRIMARY KEY IDENTITY(1,1),
+    Emri VARCHAR(100),
+    Email VARCHAR(100) UNIQUE,
+    Fjalekalimi VARCHAR(255),
+    Adresa VARCHAR(255),
+    DataRegjistrimit DATETIME DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE Produkti (
+    ProduktID INT PRIMARY KEY IDENTITY(1,1),
+    Emri VARCHAR(100),
+    Pershkrimi VARCHAR(MAX),
+    Cmimi DECIMAL(10,2),
+    Stoku INT,
+    Available BIT
+);
+GO
+
+CREATE TABLE Porosia (
+    PorosiID INT PRIMARY KEY IDENTITY(1,1),
+    KlientID INT,
+    DataPorosis DATETIME DEFAULT GETDATE(),
+    Statusi VARCHAR(20),
+    Totali DECIMAL(10,2),
+    FOREIGN KEY (KlientID) REFERENCES Klienti(KlientID)
+);
+GO
+
+CREATE TABLE PorosiDetaje (
+    DetajeID INT PRIMARY KEY IDENTITY(1,1),
+    PorosiID INT,
+    ProduktID INT,
+    Sasia INT,
+    CmimiNeBlerje DECIMAL(10,2),
+    FOREIGN KEY (PorosiID) REFERENCES Porosia(PorosiID),
+    FOREIGN KEY (ProduktID) REFERENCES Produkti(ProduktID)
+);
+GO
+
+CREATE TABLE Pagesa (
+    PagesaID INT PRIMARY KEY IDENTITY(1,1),
+    PorosiID INT UNIQUE,
+    Metoda VARCHAR(20),
+    Shuma DECIMAL(10,2),
+    DataPageses DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (PorosiID) REFERENCES Porosia(PorosiID)
+);
+GO
+
+INSERT INTO Klienti (Emri, Email, Fjalekalimi, Adresa)
+VALUES 
+('Ardit Krasniqi', 'ardit@test.com', '12345', 'Prishtinë'),
+('Elira Berisha', 'elira@test.com', '54321', 'Prizren'),
+('Besim Gashi', 'besim@test.com', 'pass123', 'Pejë');
+
+INSERT INTO Produkti (Emri, Pershkrimi, Cmimi, Stoku, Available)
+VALUES
+('Laptop Dell', 'Laptop për punë dhe lojëra', 1200.00, 10, 1),
+('Telefon Samsung', 'Samsung Galaxy S22', 800.00, 15, 1),
+('Router TP-Link', 'Router Wi-Fi me 4 porte', 50.00, 30, 1);
+
+INSERT INTO Porosia (KlientID, Statusi, Totali)
+VALUES
+(1, 'NeProces', 2050.00),
+(2, 'Perfunduar', 800.00);
+
+INSERT INTO PorosiDetaje (PorosiID, ProduktID, Sasia, CmimiNeBlerje)
+VALUES
+(1, 1, 1, 1200.00),
+(1, 2, 1, 800.00),
+(1, 3, 1, 50.00),
+(2, 2, 1, 800.00);
+
+INSERT INTO Pagesa (PorosiID, Metoda, Shuma)
+VALUES
+(2, 'Card', 800.00);
+
+SELECT * FROM Klienti;
+
+SELECT * FROM Produkti;
+
+SELECT p.PorosiID, k.Emri, pd.ProduktID, pd.Sasia, pd.CmimiNeBlerje
+FROM Porosia p
+JOIN Klienti k ON p.KlientID = k.KlientID
+JOIN PorosiDetaje pd ON p.PorosiID = pd.PorosiID;
+
+SELECT * FROM Pagesa;
